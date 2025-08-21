@@ -1,0 +1,31 @@
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.2
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USERNAME}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    command:
+      - start-dev
+      - --import-realm
+    ports:
+      - "8080:8080"
+    env_file: .env
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./keycloak/keycloak_init:/opt/keycloak/data/import
+    networks:
+      - demo-net
+
+  microservice:
+    build: ./microservice
+    ports:
+      - "4000:4000"
+    networks:
+      - demo-net
+
+volumes:
+  keycloak_data:
+
+networks:
+  demo-net:

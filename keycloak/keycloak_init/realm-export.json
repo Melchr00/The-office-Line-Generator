@@ -1,0 +1,55 @@
+{
+  "realm": "demo-realm",
+  "enabled": true,
+  "users": [
+    {
+      "username": "free",
+      "firstName": "Free",
+      "lastName": "User",
+      "email": "free@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "free"
+        }
+      ],
+      "realmRoles": [""]
+    },
+    {
+      "username": "paid",
+      "firstName": "Paid",
+      "lastName": "User",
+      "email": "paid@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "paid"
+        }
+      ],
+      "realmRoles": ["paid"]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "paid"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "gateway-client",
+      "name": "Gateway Client",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": ["http://localhost:5173/"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true
+    }
+  ]
+}
