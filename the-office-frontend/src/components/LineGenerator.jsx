@@ -1,38 +1,40 @@
-import { useState } from "react";
 import { motion, AnimatePresence, useAnimation} from "framer-motion";
 import { QuoteDisplay } from "./QuoteDisplay";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { GradientBorder } from "./GradientBorder";
-import { color_palettes, stringToColors } from "../utils/colorPalettes";
+import { useAuth } from "react-oidc-context";
+import ToggleSwitch from "./ToggleSwitch";
+import { useQuote } from "../utils/useQuote";
+import { getGradientForQuote } from "../utils/gradients";
+import {getScaleForQuote} from "../utils/quoteScaling";
+import { useState } from "react";
 
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const LineGenerator = () => {
-    const [quote, setQuote] = useState(null);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+
+     const [allowLogin, setAllowLogin] = useState(() => {
+        const saved = localStorage.getItem("loginToggle");
+        return saved ? JSON.parse(saved) : false
+    })
+    const {isAuthenticated, user, isLoading, signinRedirect, signoutRedirect } = useAuth();
+    const {quote, loading, error, fetchRandomLine} = useQuote(API_URL, user, allowLogin);
+
+   
 
 
     const buttonControls = useAnimation();
     const audioPath = "/drop_003.ogg";
 
-    const fetchRandomLine = async () => {
-        setError(null);
-        setLoading(true);
-
-        try {
-            const res = await fetch(`${API_URL}/random`, {})
-            if (!res.ok) throw new Error("Network response was not ok");
-            const data = await res.json();
-            setQuote(data);
-        } catch (err) {
-            setError("Could not fetch a quote. Please try again.")
-            setQuote(null);
-        } finally {
-            setLoading(false);
+    const handleLoginLogout = () => {
+        if(isAuthenticated) {
+            signoutRedirect();
+        } else {
+            signinRedirect();
         }
     }
+   
 
     const handleClick = async () => {
         await new Audio(audioPath).play();
@@ -41,22 +43,34 @@ const LineGenerator = () => {
         await buttonControls.start({ scale: 1, transition: { duration: 0.2 } })
     }
 
-    const baseHue = quote ? color_palettes[quote.character]?.[0] : null;
-    const colors = quote ? stringToColors(quote.character, 5, baseHue) : null;
-    const gradient = colors ? `conic-gradient(${colors.join(", ")})` : "conic-gradient(#000, #333)";
-
-    const getScaleForQuote = (q) => {
-        if (!q?.line) return 1;
-        const len = q.line.length;
-        if (len > 120) return 0.85;
-        if (len > 80) return 0.9;
-        if (len > 40) return 0.95;
-        return 1;
-    }
+    const gradient = getGradientForQuote(quote);
     const scale = getScaleForQuote(quote);
 
     return (
         <main className="relative h-screen flex items-center justify-center bg-gray-100 p-4 sm:p-6 overflow-hidden">
+           <div className="absolute top-4 left-4">
+            <ToggleSwitch
+            onToggle={(state) => {
+                setAllowLogin(state);
+                localStorage.setItem("loginToggle", state)
+            }}
+            label="Enable Login"
+            disabled={false}
+            forceOn={isAuthenticated}
+            initial={allowLogin}
+            />
+           </div>
+           <div className="absolute top-4 right-4">
+            <button
+            onClick={handleLoginLogout}
+            disabled={isLoading || (!allowLogin && !isAuthenticated)}
+            className={`px-4 py-2 rounded-lg text-white font-semibold transition-colors ${isAuthenticated ? "bg-red-600 hover:bg-red-700"
+                : allowLogin ? "bg-blue-600 hover:bg-blue-700": "bg-gray-400 cursor-not-allowed"}`}
+            >
+                {isLoading ? "..." : isAuthenticated ? "Logout" : "Login"}
+            </button>
+           </div>
+           
             <GradientBorder gradient={gradient}>
                 <motion.section
                     layout
