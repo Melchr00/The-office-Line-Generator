@@ -1,10 +1,11 @@
 import './index.css'
+import LineGenerator from './components/LineGenerator';
 
 function App() {
  
   return (
-  <div className="App bg-orange-500">
-Hello
+  <div className="App">
+     <LineGenerator />
   </div>
   );
 }
