@@ -1,6 +1,8 @@
+/*** React hook for fetching and managing quotes.
+ * Handles API requests, role-based access control, and loading/error states. ***/
+
 import { useState, useCallback } from "react";
 import { getRolesFromToken } from "./auth";
-
 
 export const useQuote = (API_URL, user, loginEnabled) => {
     const [quote, setQuote] = useState(null);
@@ -21,8 +23,6 @@ export const useQuote = (API_URL, user, loginEnabled) => {
                 return;
             }
         }
-
-
         try {
             const res = await fetch(`${API_URL}/random`, {})
 

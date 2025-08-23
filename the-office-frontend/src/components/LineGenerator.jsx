@@ -1,4 +1,6 @@
-import { motion, AnimatePresence, useAnimation} from "framer-motion";
+/*** Main component. Handles authentication, quote fetching, animations, and UI layout. ***/
+
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { QuoteDisplay } from "./QuoteDisplay";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { GradientBorder } from "./GradientBorder";
@@ -6,36 +8,38 @@ import { useAuth } from "react-oidc-context";
 import ToggleSwitch from "./ToggleSwitch";
 import { useQuote } from "../utils/useQuote";
 import { getGradientForQuote } from "../utils/gradients";
-import {getScaleForQuote} from "../utils/quoteScaling";
+import { getScaleForQuote } from "../utils/quoteScaling";
 import { useState } from "react";
 
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const LineGenerator = () => {
-
-     const [allowLogin, setAllowLogin] = useState(() => {
+    // Toggle login requirement, persisted in localStorage
+    const [allowLogin, setAllowLogin] = useState(() => {
         const saved = localStorage.getItem("loginToggle");
         return saved ? JSON.parse(saved) : false
     })
-    const {isAuthenticated, user, isLoading, signinRedirect, signoutRedirect } = useAuth();
-    const {quote, loading, error, fetchRandomLine} = useQuote(API_URL, user, allowLogin);
-
-   
-
+    const { isAuthenticated, user, isLoading, signinRedirect, signoutRedirect } = useAuth();
+    const { quote, loading, error, fetchRandomLine } = useQuote(API_URL, user, allowLogin);
 
     const buttonControls = useAnimation();
     const audioPath = "/drop_003.ogg";
 
+    /**
+   * Handle login/logout depending on current auth state.
+   */
     const handleLoginLogout = () => {
-        if(isAuthenticated) {
+        if (isAuthenticated) {
             signoutRedirect();
         } else {
             signinRedirect();
         }
     }
-   
 
+    /**
+        * Play a sound, fetch a new quote, and animate the button press.
+        */
     const handleClick = async () => {
         await new Audio(audioPath).play();
         fetchRandomLine();
@@ -48,29 +52,31 @@ const LineGenerator = () => {
 
     return (
         <main className="relative h-screen flex items-center justify-center bg-gray-100 p-4 sm:p-6 overflow-hidden">
-           <div className="absolute top-4 left-4">
-            <ToggleSwitch
-            onToggle={(state) => {
-                setAllowLogin(state);
-                localStorage.setItem("loginToggle", state)
-            }}
-            label="Enable Login"
-            disabled={false}
-            forceOn={isAuthenticated}
-            initial={allowLogin}
-            />
-           </div>
-           <div className="absolute top-4 right-4">
-            <button
-            onClick={handleLoginLogout}
-            disabled={isLoading || (!allowLogin && !isAuthenticated)}
-            className={`px-4 py-2 rounded-lg text-white font-semibold transition-colors ${isAuthenticated ? "bg-red-600 hover:bg-red-700"
-                : allowLogin ? "bg-blue-600 hover:bg-blue-700": "bg-gray-400 cursor-not-allowed"}`}
-            >
-                {isLoading ? "..." : isAuthenticated ? "Logout" : "Login"}
-            </button>
-           </div>
-           
+            {/* Toggle for enabling login (persisted in localStorage) */}
+            <div className="absolute top-4 left-4">
+                <ToggleSwitch
+                    onToggle={(state) => {
+                        setAllowLogin(state);
+                        localStorage.setItem("loginToggle", state)
+                    }}
+                    label="Enable Login"
+                    disabled={false}
+                    forceOn={isAuthenticated}
+                    initial={allowLogin}
+                />
+            </div>
+            {/* Login/logout button */}
+            <div className="absolute top-4 right-4">
+                <button
+                    onClick={handleLoginLogout}
+                    disabled={isLoading || (!allowLogin && !isAuthenticated)}
+                    className={`px-4 py-2 rounded-lg text-white font-semibold transition-colors ${isAuthenticated ? "bg-red-600 hover:bg-red-700"
+                        : allowLogin ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"}`}
+                >
+                    {isLoading ? "..." : isAuthenticated ? "Logout" : "Login"}
+                </button>
+            </div>
+            {/* Quote display wrapped with animated gradient-border */}
             <GradientBorder gradient={gradient}>
                 <motion.section
                     layout
@@ -98,7 +104,7 @@ const LineGenerator = () => {
                             {loading ? <LoadingSpinner /> : <QuoteDisplay quote={quote} />}
                         </AnimatePresence>
                     </motion.div>
-
+                    {/* Generate Quote button */}
                     <motion.button
                         layout
                         animate={buttonControls}

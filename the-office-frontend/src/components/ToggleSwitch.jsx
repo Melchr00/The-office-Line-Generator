@@ -1,14 +1,20 @@
+/*** Basic toggle-switch component.
+ * Supports disabled and forced-on states, with keyboard and screen reader accessibility. ***/
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 export const ToggleSwitch = ({
     onToggle, initial = false, label = "Enable Login", disabled = false, forceOn = false }) => {
-    const [ enabled, setEnabled ] = useState(initial)
+    const [enabled, setEnabled] = useState(initial)
 
     useEffect(() => {
         if (forceOn) setEnabled(true);
     }, [forceOn]);
 
+    /**
+     * Toggle state if not disabled/forced-on.
+     */
     const handleToggle = () => {
         if (disabled || forceOn) return;
         const newState = !enabled;

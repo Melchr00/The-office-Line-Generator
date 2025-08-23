@@ -1,9 +1,10 @@
+/*** Authentication helper to decode JWT tokens and extract user roles. ***/
 export const getRolesFromToken = (token) => {
-    if(!token) return [];
+    if (!token) return [];
     try {
         const payload = JSON.parse(atob(token.split(".")[1]));
         return payload?.realm_access?.roles || [];
-    } catch(err) {
+    } catch (err) {
         console.error("Error decoding token", err);
         return [];
     }

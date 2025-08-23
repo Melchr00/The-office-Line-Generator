@@ -1,3 +1,9 @@
+/***Utilities for getting colors for background-gradient based on character ***/
+
+/**
+ * Predefined color palettes for characters from The Office.
+ * Used to give each character a consistent visual identity.
+ */
 export const color_palettes = {
   "Michael": ['#28a0f4'],
   "Pam": ['#B585BC'],
@@ -21,9 +27,10 @@ export const color_palettes = {
   "Darryl": ['#96844cff'],
 }
 
-
-
-// Helper
+/**
+ * Convert a hex color to HSL.
+ * Useful for generating variations and gradients.
+ */
 function hexToHsl(hex) {
   hex = hex.replace(/^#/, '');
   let r = parseInt(hex.substring(0, 2), 16) / 255;
@@ -33,7 +40,7 @@ function hexToHsl(hex) {
   let max = Math.max(r, g, b), min = Math.min(r, g, b);
   let h, s, l = (max + min) / 2;
   if (max === min) {
-    h = s = 0; // achromatic
+    h = s = 0; // gray / achromatic
   } else {
     let d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -47,9 +54,12 @@ function hexToHsl(hex) {
   return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
 }
 
-
+/**
+ * Generate a list of colors based on a string or a base hex color.
+ * Ensures consistent gradients that vary by character name or custom hue.
+ */
 export function stringToColors(str, count = 5, baseHue = null) {
-  // If baseHue is a hex, generate a gradient from it
+  // If baseHue is hex, generate gradient from it
   if (typeof baseHue === 'string' && baseHue.startsWith('#')) {
     const [h, s, l] = hexToHsl(baseHue);
     const colors = [];
@@ -59,7 +69,7 @@ export function stringToColors(str, count = 5, baseHue = null) {
     return colors;
   }
 
-  // Original hash-based logic
+  // Hash-based logic for consistent pseudo-random colors
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
