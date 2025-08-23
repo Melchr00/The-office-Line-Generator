@@ -16,7 +16,7 @@ An authenticated Web app that generates a random The-Office line and displays it
 [https://youtu.be/yBeCqHhJr8A?si=uQbm4iDfCFYW7Aoq]()
 
 ## Installation && Usage
-- 1. Clone the repo (git clone GitHubLink)
+- 1. Clone the repo (git clone https://github.com/Melchr00/The-office-Line-Generator.git)
 - 2. Start Docker-containers (docker-compose up --build)
 - 3. Navigate to frontend-folder (cd the-office-frontend)
 - 4. Install dependencies (npm install)
