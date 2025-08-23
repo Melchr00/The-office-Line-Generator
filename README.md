@@ -13,7 +13,7 @@ An authenticated Web app that generates a random The-Office line and displays it
 - Custom background colors based on Character
 
 ## Demo / Code Walkthrough
-[Youtube Link]()
+[https://youtu.be/yBeCqHhJr8A?si=uQbm4iDfCFYW7Aoq]()
 
 ## Installation && Usage
 - 1. Clone the repo (git clone GitHubLink)
