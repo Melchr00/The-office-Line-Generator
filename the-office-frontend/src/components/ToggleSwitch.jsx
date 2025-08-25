@@ -27,7 +27,7 @@ export const ToggleSwitch = ({
                 onClick={handleToggle}
                 whileTap={{ scale: disabled || forceOn ? 1 : 0.9 }}
                 className={`relative w-12 h-6 rounded-full flex items-center px-1 focus:outline-none 
-        focus-visile:ring-2 focus-visible:ring-blue-400 transition-colors duration-300
+        focus-visible:ring-2 focus-visible:ring-blue-400 transition-colors duration-300
         ${enabled ? "bg-blue-600" : "bg-gray-300"} ${disabled || forceOn ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                 role="switch"
                 aria-checked={enabled}
