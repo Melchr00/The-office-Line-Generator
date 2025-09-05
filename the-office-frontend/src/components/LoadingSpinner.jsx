@@ -1,7 +1,7 @@
 /*** Simple loading spinner component.
  * Provides accessible feedback when a new quote is loading. ***/
 
-export const LoadingSpinner = () => {
+export const LoadingSpinner = () => (
     <div
         role="status"
         aria-live="polite"
@@ -29,4 +29,4 @@ export const LoadingSpinner = () => {
             />
         </svg>
     </div>
-}
+)
