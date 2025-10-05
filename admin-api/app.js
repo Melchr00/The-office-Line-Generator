@@ -9,6 +9,8 @@ app.use(cors())
 const dotenv = require('dotenv');
 dotenv.config();
 
+const { get_access_token } = require('./utils/auth');
+
 //Environment variable declerations
 // Environment variable declarations
 const admin_keycloak_url = process.env.ADMIN_KEYCLOAK_URL;
@@ -17,7 +19,19 @@ const keycloak_admin_api_base_url = process.env.KEYCLOAK_ADMIN_API_BASE_URL;
 const keycloak_admin_username = process.env.KEYCLOAK_ADMIN_USERNAME;
 const keycloak_admin_password = process.env.KEYCLOAK_ADMIN_PASSWORD;
 
-
+app.get('/api/admin/accessToken', async(req, res)=> {
+  try {
+    const token = await get_access_token(admin_keycloak_url,admin_keycloak_clientId,keycloak_admin_username, keycloak_admin_password)
+    console.log('Access token: ', token);
+    res.status(200).json({ access_token: token });
+  } catch(err) {
+    console.error("Failed to get token");
+     res.status(500).json({
+      message: 'Could not fetch access token',
+      error: err.response?.data || err.message || err
+    });
+  }
+})
 
 
 
@@ -31,12 +45,7 @@ app.get('/health', (req, res) => {
 })
 
 app.post('/api/admin/createUser', (req, res) => {
- console.log('Loaded Environment Variables:');
-  console.log('ADMIN_KEYCLOAK_URL:', admin_keycloak_url);
-  console.log('ADMIN_KEYCLOAK_CLIENT_ID:', admin_keycloak_clientId);
-  console.log('KEYCLOAK_ADMIN_API_BASE_URL:', keycloak_admin_api_base_url);
-  console.log('KEYCLOAK_ADMIN_USERNAME:', keycloak_admin_username);
-  console.log('KEYCLOAK_ADMIN_PASSWORD:', keycloak_admin_password);
+
 
   res.json({
     message: 'Environment variables printed to server console!',
