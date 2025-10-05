@@ -9,7 +9,7 @@ app.use(cors())
 const dotenv = require('dotenv');
 dotenv.config();
 
-const { get_roles, get_access_token, get_users } = require('./utils/auth');
+const { get_role, get_access_token, get_users } = require('./utils/auth');
 
 //Environment variable declerations
 // Environment variable declarations
@@ -33,21 +33,39 @@ app.get('/api/admin/accessToken', async(req, res)=> {
   }
 })
 
-app.get('/api/admin/roles', async(req, res)=> {
+app.get('/api/admin/roles/:roleName', async (req, res) => {
   try {
-    const token = await get_access_token(admin_keycloak_url,admin_keycloak_clientId,keycloak_admin_username, keycloak_admin_password)
-    console.log('Access token: ', token);
-    url = keycloak_admin_api_base_url + "/roles"
-    roles = await get_roles(url, token)
-    res.status(200).json({ roles: roles });
-  } catch(err) {
-    console.error("Failed to get roles");
-     res.status(500).json({
-      message: 'Could not fetch roles',
+    // Extract the role name from the route parameter
+    const roleName = req.params.roleName;
+    console.log(`Fetching role: ${roleName}`);
+
+    // Get admin access token
+    const token = await get_access_token(
+      admin_keycloak_url,
+      admin_keycloak_clientId,
+      keycloak_admin_username,
+      keycloak_admin_password
+    );
+
+    // Build the URL to query roles
+    const url = `${keycloak_admin_api_base_url}/roles`;
+
+    // Call your get_role helper function
+    const role = await get_role(url, token, roleName);
+
+    if (!role) {
+      return res.status(404).json({ message: `Role "${roleName}" not found` });
+    }
+
+    res.status(200).json(role);
+  } catch (err) {
+    console.error("Failed to get role:", err.response?.data || err.message || err);
+    res.status(500).json({
+      message: 'Could not fetch role',
       error: err.response?.data || err.message || err
     });
   }
-})
+});
 
 app.get('/api/admin/users', async(req, res)=> {
   try {
