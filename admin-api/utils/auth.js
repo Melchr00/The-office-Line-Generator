@@ -1,6 +1,34 @@
 const axios = require('axios');
 const qs = require('qs'); // For URL-encoded payload
 
+async function get_roles(token_url, access_token) {
+    const headers = {
+        'Authorization': "Bearer " +access_token
+    };
+
+    try {
+        const response = await axios.get(token_url, { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error getting roles:', error.response?.data || error.message);
+        throw error;
+    }
+}
+
+async function get_users(token_url, access_token) {
+    const headers = {
+        'Authorization': "Bearer " +access_token
+    };
+
+    try {
+        const response = await axios.get(token_url, { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error getting users:', error.response?.data || error.message);
+        throw error;
+    }
+}
+
 async function get_access_token(token_url, client_id, username, password) {
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -24,4 +52,4 @@ async function get_access_token(token_url, client_id, username, password) {
     }
 }
 
-module.exports = { get_access_token };
+module.exports = { get_roles, get_access_token, get_users };
