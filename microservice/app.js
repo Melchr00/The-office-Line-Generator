@@ -6,6 +6,7 @@ app.use(express.json());
 const cors = require('cors');
 app.use(cors())
 
+
 /**
  * Health check endpoint.
  * Used to verify the service is running without errors.
