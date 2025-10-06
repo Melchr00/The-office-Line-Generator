@@ -7,15 +7,9 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const {
-  get_role,
-  get_access_token,
-  get_users,
-  appendRole_to_User,
-  removeRole_from_User,
-  createUser,
-  deleteUser
-} = require('./utils/auth');
+const { get_access_token } = require('./utils/auth');
+const { get_user, createUser, deleteUser } = require('./utils/userManagement');
+const { get_role, appendRole_to_User, removeRole_from_User } = require('./utils/subscriptionManagement');
 
 // -----------------------------------------------------------------------------
 // Initialization & Middleware
@@ -62,9 +56,9 @@ app.get('/api/admin/accessToken', async (req, res) => {
   }
 });
 
+
 /**
- * GET /api/admin/roles/:roleName
- * Fetches details for a specific role.
+ * Retrieve a specific role by name from Keycloak.
  */
 app.get('/api/admin/roles/:roleName', async (req, res) => {
   try {
@@ -107,7 +101,7 @@ app.get('/api/admin/users/:userName', async (req, res) => {
       keycloak_admin_password
     );
 
-    const user = await get_users(base_url, token, userName);
+    const user = await get_user(base_url, token, userName);
     if (!user) return res.status(404).json({ message: `User "${userName}" not found` });
 
     res.status(200).json(user);
@@ -136,7 +130,7 @@ app.post('/api/admin/users/:userName/roles/:roleName', async (req, res) => {
       keycloak_admin_password
     );
 
-    const user = await get_users(base_url, token, userName);
+    const user = await get_user(base_url, token, userName);
     if (!user) return res.status(404).json({ message: `User "${userName}" not found` });
 
     const role = await get_role(base_url, token, roleName);
@@ -173,7 +167,7 @@ app.delete('/api/admin/users/:userName/roles/:roleName', async (req, res) => {
       keycloak_admin_password
     );
 
-    const user = await get_users(base_url, token, userName);
+    const user = await get_user(base_url, token, userName);
     if (!user) return res.status(404).json({ message: `User "${userName}" not found` });
 
     const role = await get_role(base_url, token, roleName);
@@ -223,7 +217,7 @@ app.post('/api/admin/createUser', async (req, res) => {
     );
 
     // Check if user already exists
-    const existingUser = await get_users(base_url, token, username);
+    const existingUser = await get_user(base_url, token, username);
     if (existingUser) {
       return res.status(409).json({ message: `User "${username}" already exists.` });
     }
@@ -279,7 +273,7 @@ app.delete('/api/admin/users/:userName', async (req, res) => {
       keycloak_admin_password
     );
 
-    const user = await get_users(base_url, token, userName);
+    const user = await get_user(base_url, token, userName);
     if (!user) return res.status(404).json({ message: `User "${userName}" not found` });
 
     await deleteUser(base_url, token, user);
