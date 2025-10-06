@@ -36,9 +36,9 @@ async function get_role(base_url, access_token, roleName) {
     throw error;
   }
 }
+
+// TODO 
 // Get user roles (GET /api/admin/users/:userName/roles)
-
-
 
 
 /**
@@ -85,8 +85,10 @@ async function removeRole_from_User(base_url, access_token, userId, roleObj) {
   }
 }
 
-
+// TODO 
 // Update subscription (Handle upgrde/downgrade) (PUT /api/admin/users/:userName/subscription)
+
+// TODO 
 // Get subscription status (GET /api/admin/users/:userName/subscription)
 
 
