@@ -7,8 +7,30 @@ const axios = require('axios');
 
 
 
-// TODO 
-// Get all roles  (GET /api/admin/roles)
+/**
+ * Retrieve all roles from Keycloak.
+ * (GET /api/admin/roles)
+ */
+async function get_roles(base_url, access_token) {
+  const headers = { Authorization: `Bearer ${access_token}` };
+
+  try {
+    const URL = `${base_url}/roles`;
+    const response = await axios.get(URL, { headers });
+
+  
+    if (response) {
+      console.log(`Found roles`);
+      return response.data;
+    } else {
+      console.warn(`Roles not found.`);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error getting roles:', error.response?.data || error.message);
+    throw error;
+  }
+}
 
 /**
  * Retrieve a specific role by name from Keycloak.
@@ -37,8 +59,30 @@ async function get_role(base_url, access_token, roleName) {
   }
 }
 
-// TODO 
-// Get user roles (GET /api/admin/users/:userName/roles)
+/**
+ * Retrieve a specific user's roles from Keycloak.
+ * (GET /api/admin/users/:userName/roles)
+ */
+async function get_userRoles(base_url, access_token, userObj) {
+  const headers = { Authorization: `Bearer ${access_token}` };
+
+  try {
+    const URL = `${base_url}/users/${userObj.id}/role-mappings/realm`;
+    const response = await axios.get(URL, { headers });
+
+
+     if (response.data && response.data.length > 0) {
+      console.log(`Found ${response.data.length} roles for user "${userObj.username}"`);
+      return response.data;
+    } else {
+      console.warn(`No roles connected to user: ${userObj.username}`);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error getting roles:', error.response?.data || error.message);
+    throw error;
+  }
+}
 
 
 /**
@@ -85,16 +129,12 @@ async function removeRole_from_User(base_url, access_token, userId, roleObj) {
   }
 }
 
-// TODO 
-// Update subscription (Handle upgrde/downgrade) (PUT /api/admin/users/:userName/subscription)
-
-// TODO 
-// Get subscription status (GET /api/admin/users/:userName/subscription)
-
 
 // Export utility functions
 module.exports = {
+  get_roles,
   get_role,
+  get_userRoles,
   appendRole_to_User,
   removeRole_from_User
 };
