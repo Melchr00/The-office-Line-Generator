@@ -36,7 +36,7 @@
   "roles": {
     "realm": [
       {
-        "name": "free",
+        "name": "tier_free",
         "attributes": {
           "tier": ["true"]
         }
