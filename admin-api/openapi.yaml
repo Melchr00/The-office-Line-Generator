@@ -1,0 +1,531 @@
+openapi: 3.0.0
+info:
+  title: Admin API
+  version: 1.0.0
+
+paths:
+  /accessToken:
+    get:
+      summary: Get Admin access-token
+      description: |
+        **Returns an active Access-token for the admin-cli client**
+      responses:
+        '200':
+          description: Returns an access token
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Token'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users:
+    get:
+      summary: Get all users
+      description: |
+        **Returns a list of all users from Keycloak**
+      responses:
+        '200':
+          description: Returns a list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '404':
+          description: Users not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{userName}:
+    get:
+      summary: Get a specific user
+      description: |
+        **Returns a specific user from Keycloak**
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the specified user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete a User by ID
+      description: |
+        **Delete user, if found.**
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /updateUser:
+    put:
+      summary: Update a user by ID
+      description: |
+        **Update specific user, if found**
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: newuser
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Doe
+                email:
+                  type: string
+                  example: John@example.com
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /createUser:
+    post:
+      summary: Create a new User
+      description: |
+        **Check if user already exists, if no conflict create it**
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: newuser
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Doe
+                email:
+                  type: string
+                  example: John@example.com
+                password:
+                  type: string
+                  example: Password123
+      responses:
+        '201':
+          description: User created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{userName}/reset-password:
+    put:
+      summary: Reset user password
+      description: |
+        **Updates an existing user's password**
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: "NewPassword123!"
+      responses:
+        '200':
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '400':
+          description: Bad Request - Missing password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to update password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{userName}/verify-email:
+    put:
+      summary: Verify user email
+      description: |
+        **Verifies the email of an existing user**
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to verify email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /roles:
+    get:
+      summary: Get all roles
+      description: |
+        **Retrieves all roles from Keycloak**
+      responses:
+        '200':
+          description: Returns all available roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '404':
+          description: Roles not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Could not fetch roles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /roles/{roleName}:
+    get:
+      summary: Get a specific role
+      description: |
+        **Retrieve a specific role by name from Keycloak**
+      parameters:
+        - in: path
+          name: roleName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the specified role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '404':
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to get role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{userName}/roles:
+    get:
+      summary: Get a user's roles
+      description: |
+        **Retrieve a specific user's roles from Keycloak**
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns user's roles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRolesResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to get user roles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{userName}/roles/{roleName}:
+    post:
+      summary: Assign role to user
+      description: |
+        **Assign a role to a specific user**
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: roleName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Role assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '404':
+          description: User or Role not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to assign role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Remove role from user
+      description: |
+        **Removes a specific role from a user**
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: roleName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Role removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '404':
+          description: User or Role not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to remove role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Token:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIs..."
+        expires_in:
+          type: integer
+          example: 300
+        token_type:
+          type: string
+          example: "Bearer"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1a2b3c"
+        username:
+          type: string
+          example: "jdoe"
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          example: "john.doe@example.com"
+        enabled:
+          type: boolean
+          example: true
+
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "123abc"
+        name:
+          type: string
+          example: "premium-user"
+        description:
+          type: string
+          example: "Provides access to premium features"
+
+    UserRolesResponse:
+      type: object
+      properties:
+        user:
+          type: string
+          example: "jdoe"
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+
+    SuccessMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Operation completed successfully."
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "An error occurred while processing the request."
+        error:
+          type: string
+          example: "User not found"
