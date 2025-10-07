@@ -15,7 +15,7 @@
           "value": "free"
         }
       ],
-      "realmRoles": [""]
+      "realmRoles": ["free"]
     },
     {
       "username": "paid",
@@ -36,7 +36,16 @@
   "roles": {
     "realm": [
       {
-        "name": "paid"
+        "name": "free",
+        "attributes": {
+          "tier": ["true"]
+        }
+      },
+      {
+        "name": "paid",
+        "attributes": {
+          "tier": ["true"]
+        }
       }
     ]
   },
