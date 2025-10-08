@@ -9,6 +9,8 @@ export default defineConfig({
     tailwindcss(),
   ],
    server: {
+     host: '127.0.0.1',
+     port: 5173,
     historyApiFallback: true, // ensures React Router handles unknown routes
   }
 })
