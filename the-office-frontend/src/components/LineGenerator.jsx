@@ -9,7 +9,7 @@ import ToggleSwitch from "./ToggleSwitch";
 import { useQuote } from "../utils/useQuote";
 import { getGradientForQuote } from "../utils/gradients";
 import { getScaleForQuote } from "../utils/quoteScaling";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -26,9 +26,23 @@ const LineGenerator = () => {
     const buttonControls = useAnimation();
     const audioPath = "/drop_003.ogg";
 
-    /**
-   * Handle login/logout depending on current auth state.
+   /**
+   * Store username in localStorage once user successfully logs in.
    */
+  useEffect(() => {
+    if (isAuthenticated && user?.profile?.preferred_username) {
+      const username = user.profile.preferred_username;
+      localStorage.setItem("userName", username);
+      console.log("Stored userName:", username);
+    } else if (!isAuthenticated) {
+      localStorage.removeItem("userName");
+    }
+  }, [isAuthenticated, user]);
+   
+   
+    /**
+     * Handle login/logout depending on current auth state.
+    */
     const handleLoginLogout = () => {
         if (isAuthenticated) {
             signoutRedirect();
