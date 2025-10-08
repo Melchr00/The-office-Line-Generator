@@ -616,5 +616,5 @@ components:
           type: string
           example: An error occurred while processing the request.
         error:
-          type: string
+          type: string-
           example: User not found
