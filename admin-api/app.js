@@ -6,6 +6,9 @@ require('module-alias/register');
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const http = require('http'); 
+const { WebSocketServer } = require('ws');
+
 
 // Initialization & Middleware
 dotenv.config();
@@ -15,8 +18,8 @@ app.use(cors());
 
 
 // Import routes
-const userRoutes = require('@routes/users');
-const roleRoutes = require('@routes/roles');
+const userRoutes = require('@routes/users')(broadcastUserUpdate);
+const roleRoutes = require('@routes/roles')(broadcastUserUpdate);
 const authRoutes = require('@routes/auth');
 
 // Mount routes
@@ -33,9 +36,29 @@ app.get('/health', (req, res) => {
   res.send('OK');
 });
 
+// WebSocket setup
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (socket) => {
+  console.log('WebSocket client connected');
+  socket.on('close', () => console.log('WebSocket client disconnected'));
+});
+
+// Broadcast helper
+function broadcastUserUpdate(username) {
+  const message = JSON.stringify({ type: 'userUpdate', username });
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) {
+      client.send(message);
+    }
+  });
+}
+
+
 
 // Server Startup
 const PORT = 4002;
-app.listen(PORT, () => {
-  console.log(`Admin API microservice running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Admin API + WS running on port ${PORT}`);
 });

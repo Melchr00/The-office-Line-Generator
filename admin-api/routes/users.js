@@ -1,8 +1,8 @@
 require('module-alias/register');
 const express = require('express');
-const router = express.Router();
 const { get_access_token } = require('@utils/auth');
 const { get_users, get_user, updateUser, createUser, deleteUser, updateUserPassword, verifyUserEmail } = require('@utils/userManagement');
+
 
 // ENV
 const admin_keycloak_url = process.env.ADMIN_KEYCLOAK_URL;
@@ -10,6 +10,9 @@ const admin_keycloak_clientId = process.env.ADMIN_KEYCLOAK_CLIENT_ID;
 const base_url = process.env.KEYCLOAK_ADMIN_API_BASE_URL;
 const keycloak_admin_username = process.env.KEYCLOAK_ADMIN_USERNAME;
 const keycloak_admin_password = process.env.KEYCLOAK_ADMIN_PASSWORD;
+
+module.exports = (broadcastUserUpdate) => {
+  const router = express.Router();
 
 /**
  * GET /api/admin/users
@@ -108,6 +111,9 @@ router.put('/updateUser', async (req, res) => {
     await updateUser(base_url, token, updatedUser);
 
     console.log(`User "${username}" successfully updated.`);
+    // Broadcast role/user update to WebSocket clients
+    broadcastUserUpdate(username);
+
     res.status(200).json({
       message: `User "${username}" successfully updated.`
     });
@@ -244,6 +250,9 @@ router.put('/users/:userName/reset-password', async (req, res) => {
     await updateUserPassword(base_url, token, existingUser, password );
 
     console.log(`User "${userName}"s password successfully updated.`);
+
+    // Broadcast role/user update to WebSocket clients
+    broadcastUserUpdate(username);
     res.status(200).json({
       message: `User "${userName}"s password successfully updated.`
     });
@@ -279,6 +288,8 @@ router.put('/users/:userName/verify-email', async (req, res) => {
     await verifyUserEmail(base_url, token, existingUser);
 
     console.log(`User "${userName}"'s email verified successfully.`);
+    // Broadcast role/user update to WebSocket clients
+    broadcastUserUpdate(username);
     res.status(200).json({
       message: `User "${userName}"'s email verified successfully.`
     });
@@ -291,6 +302,6 @@ router.put('/users/:userName/verify-email', async (req, res) => {
   }
 });
 
+ return router;
+};
 
-
-module.exports = router;

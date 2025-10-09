@@ -12,6 +12,9 @@ const base_url = process.env.KEYCLOAK_ADMIN_API_BASE_URL;
 const keycloak_admin_username = process.env.KEYCLOAK_ADMIN_USERNAME;
 const keycloak_admin_password = process.env.KEYCLOAK_ADMIN_PASSWORD;
 
+module.exports = (broadcastUserUpdate) => {
+  const router = express.Router();
+
 /**
  * Get /api/admin/roles
  * Retrieves all roles from Keycloak.
@@ -188,6 +191,8 @@ router.put('/users/:userName/roles', async (req, res) => {
     await appendRole_to_User(base_url, token, user.id, newRole);
 
     console.log(`User "${userName}" roles updated to "${roleName}" successfully.`);
+    // Broadcast role/user update to WebSocket clients
+    broadcastUserUpdate(userName);
     res.status(200).json({
       message: `User "${userName}" roles updated to "${roleName}" successfully.`
     });
@@ -266,6 +271,8 @@ router.post('/users/:userName/roles/:roleName', async (req, res) => {
     await appendRole_to_User(base_url, token, user.id, role);
 
     console.log(`Role "${roleName}" successfully assigned to "${userName}".`);
+    // Broadcast role/user update to WebSocket clients
+    broadcastUserUpdate(userName);
     res.status(200).json({
       message: `Role "${roleName}" successfully assigned to user "${userName}".`
     });
@@ -303,6 +310,8 @@ router.delete('/users/:userName/roles/:roleName', async (req, res) => {
     await removeRole_from_User(base_url, token, user.id, role);
 
     console.log(`Role "${roleName}" successfully removed from "${userName}".`);
+    // Broadcast role/user update to WebSocket clients
+    broadcastUserUpdate(userName);
     res.status(200).json({
       message: `Role "${roleName}" successfully removed from user "${userName}".`
     });
@@ -315,4 +324,5 @@ router.delete('/users/:userName/roles/:roleName', async (req, res) => {
   }
 });
 
-module.exports = router;
+ return router;
+};

@@ -12,8 +12,22 @@ export const Account = () => {
 
   // Fetch user info when the component mounts
   useEffect(() => {
-    fetchUserInfo();
-  }, [fetchUserInfo]);
+    fetchUserInfo(); //initial load
+  // ✅ Listen for backend WebSocket events
+    const ws = new WebSocket("ws://localhost:4002");
+
+    ws.onopen = () => console.log("Connected to WS for role updates");
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "roleUpdate" && data.username === userName) {
+        console.log("Role update detected — refreshing account info");
+        fetchUserInfo();
+      }
+    };
+    ws.onclose = () => console.log("WebSocket closed");
+
+    return () => ws.close();
+  }, [userName, fetchUserInfo]);
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700">
